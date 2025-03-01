@@ -1,61 +1,86 @@
-# Proxmox VM Deployment with Terraform
+# Terraform Proxmox K3s VM Deployment
 
 ## Overview
-This repository contains Terraform configurations for deploying virtual machines on **Proxmox**. The setup provisions one master node and one worker node across two different Proxmox hosts.
+This Terraform module automates the provisioning of **K3s cluster virtual machines** on **Proxmox VE** using **Cloud-Init**. It creates a **master node** and a **worker node** with user-defined configurations.
 
 ## Features
-- **Automated VM provisioning** on Proxmox
-- **Cloud-init configuration** for seamless setup
-- **Pre-configured networking and SSH access**
-- **Automatic VM startup and reboot**
-
-## Repository Structure
-```
-terraform-proxmox/
-│── main.tf          # Terraform configuration for VM deployment
-│── provider.tf      # Proxmox provider settings
-│── output.tf        # Output definitions for VM details
-│── .gitignore       # Files to ignore in version control
-│── README.md        # Project documentation
-```
+- **Automated VM creation** using Cloud-Init
+- **Dynamic IP assignment** via module variables
+- **Secure SSH key injection**
+- **Custom resource allocation** (CPU, RAM, Storage)
+- **Supports multiple Proxmox nodes**
 
 ## Prerequisites
-Ensure you have the following before running Terraform:
-- **Proxmox server** with API access enabled
-- **Terraform** installed on your machine
-- **SSH access** to Proxmox nodes
+Ensure the following before running the Terraform module:
+- **Proxmox VE** with API access enabled
+- **Terraform** (v1.6.0 or later)
+- **Cloud-Init template** created on Proxmox
+- **SSH key pair** for authentication
 
-## VM Details
-| Name        | Proxmox Node | IP Address       | Cores | RAM  | Disk  |
-|------------|-------------|------------------|-------|------|-------|
-| master-node | pve1        | 192.168.2.180    | 2     | 2048 | 15GB  |
-| worker-node | pve2        | 192.168.2.181    | 2     | 2048 | 15GB  |
+## Installation
+### Clone the Repository
+```bash
+git clone https://github.com/yourusername/k3s-vm-terraform.git
+cd k3s-vm-terraform
+```
 
-## Usage
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/yourusername/terraform-proxmox.git
-   cd terraform-proxmox
-   ```
+### Configure Terraform Variables
+Update `main.tf` with your desired configuration:
+```hcl
+module "k3s_vm" {
+  source        = "./modules/proxmox_vm"
+  vm_count      = 2
+  vm_name       = ["master-node", "worker-node"]
+  target_nodes  = ["pve1", "pve2"]
+  cores         = 2
+  memory        = 2048
+  disk_size     = "15G"
+  storage       = "local-lvm"
+  cloudinit_snippet = "local:snippets/qemu-guest-agent.yml"
+  proxmox_user  = "root@pam"
+  proxmox_password = "yourpassword"
+  ssh_user      = "shahzaib"
+  ssh_password  = "admin"
+  ssh_keys      = file("~/.ssh/id_rsa.pub")
+  ip_addresses  = ["192.168.2.180", "192.168.2.181"]
+}
+```
 
-2. **Initialize Terraform**
-   ```bash
-   terraform init
-   ```
+### Initialize Terraform
+```bash
+terraform init
+```
 
-3. **Apply the Terraform configuration**
-   ```bash
-   terraform apply -auto-approve
-   ```
+### Plan Deployment
+```bash
+terraform plan
+```
 
-4. **Retrieve VM IP addresses**
-   ```bash
-   terraform output
-   ```
+### Apply Deployment
+```bash
+terraform apply -auto-approve
+```
+
+## Verification
+After deployment, verify the VMs:
+```bash
+terraform output vm_ipv4
+```
+Check on Proxmox Web UI or SSH into the master node:
+```bash
+ssh shahzaib@192.168.2.180
+```
+
+## Cleanup
+To destroy the created VMs:
+```bash
+terraform destroy -auto-approve
+```
 
 ## Notes
-- Ensure Proxmox nodes are accessible over the network.
-- Modify `main.tf` to adjust VM settings if needed.
+- Ensure Cloud-Init template exists before running Terraform.
+- Update Proxmox API credentials securely using environment variables instead of hardcoding passwords.
+- Modify variables to scale VMs dynamically.
 
 ## License
 This project is licensed under the MIT License.
