@@ -15,15 +15,21 @@ This repository contains my home lab setup using **Proxmox, Terraform, Ansible, 
 ## Repository Structure
 
 ```
-home-labs/
-│── ansible/           # Ansible playbooks and roles
-│── terraform/         # Terraform configuration for VM provisioning
-│── kubernetes/        # Kubernetes (K3s) setup and manifests
-│── docs/              # Documentation, guides, and architecture diagrams
-│── scripts/           # Helper scripts for automation
-│── .gitignore         # Files to ignore in version control
-│── README.md          # Project documentation
-│── LICENSE            # License for the repository
+├── LICENSE
+├── README.md
+├── ansible
+│   └── k3s
+│       ├── README.md
+│       ├── inventory.ini
+│       └── k3s.yml
+├── proxmox-cloudint-templete
+│   └── README.md
+└── terraform
+    └── k3s-vm
+        ├── README.md
+        ├── main.tf
+        ├── output.tf
+        └── provider.tf
 ```
 
 ## Getting Started
