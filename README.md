@@ -28,8 +28,12 @@ This repository contains my home lab setup using **Proxmox, Terraform, Ansible, 
     └── k3s-vm
         ├── README.md
         ├── main.tf
-        ├── output.tf
-        └── provider.tf
+        └── modules
+            └── proxmox_vm
+                ├── main.tf
+                ├── output.tf
+                ├── provider.tf
+                └── variables.tf
 ```
 
 ## Getting Started
@@ -56,15 +60,11 @@ Before you begin, ensure you have the following installed:
    terraform init
    terraform apply
    ```
-3. **Run Ansible Playbooks**
+
+3. **Deploy Kubernetes (K3s)**
    ```bash
-   cd ansible
-   ansible-playbook -i inventory setup.yaml
-   ```
-4. **Deploy Kubernetes (K3s)**
-   ```bash
-   cd kubernetes/k3s-setup
-   ansible-playbook deploy-k3s.yaml
+   cd ansible/k3s
+   ansible-playbook -i inventory k3s.yaml
    ```
 
 ## Diagrams & Documentation
